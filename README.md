@@ -37,14 +37,32 @@ sebelum menggunakan tools atau menulis decision Anda sendiri.
 > Secure Decision works when it is read thoughtfully.
 > Tools are secondary. Decisions are primary.
 
-## local dev
-python -m venv .venv
-source .venv/bin/activate   # macOS/Linux
-# .venv\Scripts\activate    # Windows PowerShell
+## Local Development
 
+### Setup Virtual Environment
+
+```bash
+python -m venv .venv
+```
+
+### Activate Virtual Environment
+
+**macOS/Linux:**
+```bash
+source .venv/bin/activate
+```
+
+**Windows PowerShell:**
+```powershell
+.venv\Scripts\activate
+```
+
+### Install Dependencies & Run
+
+```bash
 pip install -r requirements.txt
 uvicorn app.main:app --reload
-
+```
 ---
 
 ## Masalah yang Kami Sasar
