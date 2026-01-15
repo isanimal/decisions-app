@@ -1,0 +1,19 @@
+{
+  "format": "secure-decision.export.v0.1",
+  "decision": {
+    "decision_id": 2,
+    "title": "Public file upload for user profile",
+    "context": "Users can upload profile pictures that are later displayed publicly.",
+    "status": "active",
+    "statement": {
+      "technical_goal": "Allow users to upload profile images with minimal latency and simple validation.",
+      "assumptions": "Uploaded files are images and will be processed by an image service before being served.",
+      "conscious_simplifications": "We rely on file extension and MIME type checks only in the first version.",
+      "non_negotiables": "Uploaded files must not be executed. Files must be stored outside application root.",
+      "accepted_worst_case": "Malicious file may be uploaded and stored, but not executed or served directly."
+    },
+    "created_at": "2026-01-03T14:10:00Z",
+    "updated_at": "2026-01-03T14:10:00Z",
+    "history": []
+  }
+}

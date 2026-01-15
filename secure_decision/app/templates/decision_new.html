@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Create Decision</h2>
+  <form method="post" action="/decisions/new">
+    <label>Title</label>
+    <input type="text" name="title" required />
+
+    <label>Context</label>
+    <textarea name="context"></textarea>
+
+    <label>Status</label>
+    <select name="status">
+      <option value="draft">draft</option>
+      <option value="active">active</option>
+    </select>
+
+    <h3>Decision Statement</h3>
+
+    <label>Technical goal</label>
+    <textarea name="technical_goal"></textarea>
+
+    <label>Assumptions</label>
+    <textarea name="assumptions"></textarea>
+
+    <label>Conscious simplifications</label>
+    <textarea name="conscious_simplifications"></textarea>
+
+    <label>Non-negotiables</label>
+    <textarea name="non_negotiables"></textarea>
+
+    <label>Accepted worst-case</label>
+    <textarea name="accepted_worst_case"></textarea>
+
+    <p><button type="submit">Save</button></p>
+  </form>
+{% endblock %}

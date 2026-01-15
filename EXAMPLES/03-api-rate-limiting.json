@@ -1,0 +1,19 @@
+{
+  "format": "secure-decision.export.v0.1",
+  "decision": {
+    "decision_id": 3,
+    "title": "Rate limiting for public API",
+    "context": "Public API is exposed to third-party integrators with different usage patterns.",
+    "status": "active",
+    "statement": {
+      "technical_goal": "Prevent abuse and resource exhaustion while allowing legitimate integrations to function.",
+      "assumptions": "Most clients behave in good faith and follow documented usage limits.",
+      "conscious_simplifications": "We apply a global rate limit per API key instead of per-endpoint limits.",
+      "non_negotiables": "API must remain available for critical integrations.",
+      "accepted_worst_case": "Aggressive clients may temporarily affect performance before limits are enforced."
+    },
+    "created_at": "2026-01-05T08:00:00Z",
+    "updated_at": "2026-01-06T08:00:00Z",
+    "history": []
+  }
+}

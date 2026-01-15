@@ -1,0 +1,17 @@
+{% extends "base.html" %} {% block content %}
+<p class="muted">Decision-oriented secure coding. No scoring. No verdict.</p>
+<p>
+  <a href="/decisions/new">Create a new decision</a>
+  <a href="/export/decisions.json">Export all (JSON)</a>
+</p>
+
+{% for d in decisions %}
+<div class="card">
+  <div>
+    <a href="/decisions/{{d.id}}"><strong>{{ d.title }}</strong></a>
+  </div>
+  <div class="muted">status: {{ d.status }} • updated: {{ d.updated_at }}</div>
+</div>
+{% else %}
+<p>No decisions yet.</p>
+{% endfor %} {% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Edit Decision</h2>
+  <form method="post" action="/decisions/{{d.id}}/edit">
+    <label>Change summary (for history)</label>
+    <input type="text" name="change_summary" value="Updated decision" />
+
+    <label>Title</label>
+    <input type="text" name="title" value="{{ d.title }}" required />
+
+    <label>Context</label>
+    <textarea name="context">{{ d.context }}</textarea>
+
+    <label>Status</label>
+    <select name="status">
+      <option value="draft" {% if d.status == "draft" %}selected{% endif %}>draft</option>
+      <option value="active" {% if d.status == "active" %}selected{% endif %}>active</option>
+    </select>
+
+    <h3>Decision Statement</h3>
+
+    <label>Technical goal</label>
+    <textarea name="technical_goal">{{ d.technical_goal }}</textarea>
+
+    <label>Assumptions</label>
+    <textarea name="assumptions">{{ d.assumptions }}</textarea>
+
+    <label>Conscious simplifications</label>
+    <textarea name="conscious_simplifications">{{ d.conscious_simplifications }}</textarea>
+
+    <label>Non-negotiables</label>
+    <textarea name="non_negotiables">{{ d.non_negotiables }}</textarea>
+
+    <label>Accepted worst-case</label>
+    <textarea name="accepted_worst_case">{{ d.accepted_worst_case }}</textarea>
+
+    <p><button type="submit">Save changes</button></p>
+  </form>
+{% endblock %}

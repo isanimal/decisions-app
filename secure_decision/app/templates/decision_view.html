@@ -1,0 +1,40 @@
+{% extends "base.html" %} {% block content %}
+<div class="card">
+  <h2>{{ d.title }}</h2>
+  <div class="muted">
+    status: {{ d.status }} • created: {{ d.created_at }} • updated: {{
+    d.updated_at }}
+  </div>
+  <p>
+    <a href="/decisions/{{d.id}}/edit">Edit</a>
+    <a href="/decisions/{{d.id}}.json">Export JSON</a>
+  </p>
+
+  <h3>Context</h3>
+  <pre>{{ d.context }}</pre>
+
+  <h3>Decision Statement</h3>
+  <p><strong>Technical goal</strong></p>
+  <pre>{{ d.technical_goal }}</pre>
+  <p><strong>Assumptions</strong></p>
+  <pre>{{ d.assumptions }}</pre>
+  <p><strong>Conscious simplifications</strong></p>
+  <pre>{{ d.conscious_simplifications }}</pre>
+  <p><strong>Non-negotiables</strong></p>
+  <pre>{{ d.non_negotiables }}</pre>
+  <p><strong>Accepted worst-case</strong></p>
+  <pre>{{ d.accepted_worst_case }}</pre>
+</div>
+
+<h3>History (latest 10)</h3>
+{% for r in revisions %}
+<div class="card">
+  <div><strong>{{ r.changed_at }}</strong> — {{ r.change_summary }}</div>
+  <div class="muted">changed: {{ r.changed_fields }}</div>
+</div>
+{% else %}
+<p class="muted">
+  No history yet. (History is created when an active decision is meaningfully
+  updated.)
+</p>
+{% endfor %} {% endblock %}

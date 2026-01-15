@@ -1,0 +1,19 @@
+{
+  "format": "secure-decision.export.v0.1",
+  "decision": {
+    "decision_id": 1,
+    "title": "Authentication for internal admin panel",
+    "context": "This decision defines how authentication is handled for an internal admin panel used by operations and engineering teams.",
+    "status": "active",
+    "statement": {
+      "technical_goal": "Restrict access to internal admin panel to authorized internal users while keeping operational overhead low.",
+      "assumptions": "The admin panel is only accessible from internal network or VPN. Admin users have separate corporate accounts.",
+      "conscious_simplifications": "We do not implement MFA in the first iteration to reduce friction for internal teams.",
+      "non_negotiables": "Credentials must not be hardcoded. Authentication logic must be centralized.",
+      "accepted_worst_case": "If internal network trust is broken, attacker may gain admin access until credentials are rotated."
+    },
+    "created_at": "2026-01-01T10:00:00Z",
+    "updated_at": "2026-01-02T09:30:00Z",
+    "history": []
+  }
+}
