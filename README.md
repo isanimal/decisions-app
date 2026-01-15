@@ -15,6 +15,38 @@ Secure Decision hadir untuk menjawab satu pertanyaan mendasar:
 
 ---
 
+## Getting Started
+
+Secure Decision bukan alat yang perlu “dipelajari fiturnya”,  
+tetapi cara berpikir yang perlu **dibaca dan dipahami**.
+
+Jika ini pertama kali Anda menggunakan Secure Decision,  
+kami sangat menyarankan urutan berikut:
+
+1. **[How to Read a Decision](HOW_TO_READ_A_DECISION.md)**  
+   Pelajari cara membaca sebuah decision tanpa menghakimi atau mencari verdict.
+
+2. **[How to Write a Good Decision](HOW_TO_WRITE_A_GOOD_DECISION.md)**  
+   Panduan praktis menulis decision yang jujur, kontekstual, dan berguna.
+
+3. **[Examples](examples/)**  
+   Lihat contoh decision nyata untuk memahami bagaimana trade-off ditulis secara eksplisit.
+
+Dokumen-dokumen ini dirancang untuk membantu Anda masuk ke mindset Secure Decision  
+sebelum menggunakan tools atau menulis decision Anda sendiri.
+> Secure Decision works when it is read thoughtfully.
+> Tools are secondary. Decisions are primary.
+
+## local dev
+python -m venv .venv
+source .venv/bin/activate   # macOS/Linux
+# .venv\Scripts\activate    # Windows PowerShell
+
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+
+---
+
 ## Masalah yang Kami Sasar
 
 Dalam praktik pengembangan perangkat lunak, banyak keputusan penting terjadi secara implisit:
