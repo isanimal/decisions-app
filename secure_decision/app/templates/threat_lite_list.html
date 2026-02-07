@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Threat Modeling Lite</h2>
+
+{% if decision %}
+  <div class="card">
+    <h3>Decision: {{ decision.title }}</h3>
+    <p><small>ID: {{ decision.id }}</small></p>
+    <div style="display: flex; gap: 10px;">
+      <a href="/decisions/{{ decision.id }}">Back to Decision</a>
+      {% if role in ["ADMIN", "MEMBER"] %}
+        <a href="/decisions/{{ decision.id }}/threat-lite/new">+ New Threat Modeling Lite</a>
+      {% endif %}
+      <a href="/threat-lite">View All</a>
+    </div>
+  </div>
+{% else %}
+  <div class="card">
+    <form method="get" action="/threat-lite">
+      <label for="decision_id">Filter by Decision</label>
+      <select name="decision_id" id="decision_id">
+        <option value="">All decisions</option>
+        {% for d in decisions %}
+        <option value="{{ d.id }}" {% if selected_decision_id == d.id %}selected{% endif %}>
+          {{ d.title }} ({{ d.id }})
+        </option>
+        {% endfor %}
+      </select>
+      <div style="margin-top: 10px;">
+        <button type="submit">Apply Filter</button>
+      </div>
+    </form>
+  </div>
+{% endif %}
+
+{% if assessments and assessments|length > 0 %}
+  <table style="width: 100%; border-collapse: collapse">
+    <thead>
+      <tr>
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Created</th>
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Decision</th>
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Outcome</th>
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Link</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in assessments %}
+      <tr>
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          {{ t.created_at.strftime("%Y-%m-%d %H:%M") if t.created_at else "" }}
+        </td>
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          {{ t.decision.title if t.decision else "Unknown" }}
+        </td>
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          {{ t.reflection_outcome }}
+        </td>
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          <a href="/decisions/{{ t.decision_id }}/threat-lite/{{ t.id }}">View</a>
+          {% if role in ["ADMIN", "MEMBER"] %}
+            <a href="/decisions/{{ t.decision_id }}/threat-lite/{{ t.id }}/edit">Edit</a>
+            <form method="post" action="/decisions/{{ t.decision_id }}/threat-lite/{{ t.id }}/archive" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+              <button type="submit">Archive</button>
+            </form>
+            <form method="post" action="/decisions/{{ t.decision_id }}/threat-lite/{{ t.id }}/delete" style="display:inline;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+              <input type="text" name="confirm" placeholder="DELETE" />
+              <button type="submit">Delete</button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p><small>No Threat Modeling Lite assessments yet.</small></p>
+{% endif %}
+{% endblock %}

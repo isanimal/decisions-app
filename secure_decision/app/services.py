@@ -39,7 +39,13 @@ def compute_changed_fields(before: Decision, after: Decision) -> list[str]:
     return changed
 
 
-def create_revision_if_needed(db: Session, before: Decision, after: Decision, change_summary: str | None = None) -> None:
+def create_revision_if_needed(
+    db: Session,
+    before: Decision,
+    after: Decision,
+    change_summary: str | None = None,
+    user_id: int | None = None,
+) -> None:
     """
     v0.1 rule:
     - If decision is ACTIVE and something meaningful changed -> create revision
@@ -50,11 +56,12 @@ def create_revision_if_needed(db: Session, before: Decision, after: Decision, ch
         return
 
     # Only create history when the decision is active (align with our v0.1 discipline)
-    if before.status != "active" and after.status != "active":
+    if before.status.upper() != "ACTIVE" and after.status.upper() != "ACTIVE":
         return
 
     rev = DecisionRevision(
         decision_id=after.id,
+        created_by=user_id,
         change_summary=(change_summary or "Updated decision"),
         changed_fields=", ".join(changed),
         before_snapshot=snapshot(before),

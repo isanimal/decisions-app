@@ -1,0 +1,35 @@
+version: 1
+assumption_tags:
+  - internal_only
+  - trusted_network
+  - trusted_service
+  - trusted_input
+  - reuse_code
+  - legacy_blackbox
+  - debug_leftover
+  - admin_only
+  - temporary_fix
+boundary_tags:
+  - client_to_backend
+  - user_to_api
+  - api_to_db
+  - service_to_service
+  - file_upload
+  - third_party
+failure_mode_tags:
+  - fail_open
+  - fail_silent
+  - verbose_error
+  - insecure_fallback
+  - retry_abuse
+control_tags:
+  - authn
+  - authz
+  - validation
+  - error_handling
+  - logging
+  - secrets
+  - crypto
+  - rate_limit
+  - integrity
+  - isolation

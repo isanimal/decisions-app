@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Initial Setup</h2>
+<p class="muted">Create the first admin account to start using the app.</p>
+
+<form method="post" action="/setup">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+  <label>Username</label>
+  <input type="text" name="username" required />
+
+  <label>Password</label>
+  <input type="password" name="password" required />
+
+  <p><button type="submit">Create Admin</button></p>
+</form>
+{% endblock %}

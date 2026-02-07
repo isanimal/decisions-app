@@ -1,0 +1,44 @@
+id: "MK-XXXX"
+version: "1.0"
+title: ""
+decision_pattern: ""
+summary: ""
+
+tags:
+  assumption: []
+  boundary: []
+  failure_mode: []
+  control: []
+
+risk:
+  outcomes: []
+  threat_scenarios: []
+
+mitigation_tiers:
+  minimal:
+    goal: ""
+    actions: []
+  standard:
+    goal: ""
+    actions: []
+  mature:
+    goal: ""
+    actions: []
+
+tradeoffs:
+  effort: ""        # low | medium | high
+  complexity: ""
+  performance: ""
+  ux_impact: ""
+
+verification_ideas: []
+anti_patterns: []
+
+references:
+  owasp_asvs: []
+  owasp_samm: []
+  owasp_wstg: []
+
+notes:
+  last_updated: "YYYY-MM-DD"
+  contributors: []

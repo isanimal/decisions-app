@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Users</h2>
+<p><a href="/admin/users/new">Create user</a></p>
+
+{% for u in users %}
+<div class="card">
+  <div><strong>{{ u.username }}</strong></div>
+  <div class="muted">User ID: {{ u.id }}</div>
+</div>
+{% else %}
+<p class="muted">No users found.</p>
+{% endfor %}
+{% endblock %}

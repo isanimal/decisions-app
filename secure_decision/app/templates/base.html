@@ -11,11 +11,50 @@
     textarea { width: 100%; min-height: 90px; }
     input[type="text"] { width: 100%; }
     label { display:block; margin-top: 10px; font-weight: bold; }
+    .top-nav { display: flex; flex-wrap: wrap; gap: 12px; margin: 8px 0 16px; }
+    .top-nav a { padding: 6px 10px; border-radius: 6px; border: 1px solid #ddd; color: #222; }
+    .top-nav a:hover { background: #f7f7f7; }
+    .stepper { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+    .step { border: 1px solid #ddd; border-radius: 999px; padding: 6px 10px; font-size: 0.9em; }
+    .step.done { background: #f1f7f1; border-color: #b9d9b9; }
+    .step.current { background: #f6f6ff; border-color: #c7c7f5; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 0.8em; border: 1px solid #ddd; }
+    .badge.draft { background: #fff7e6; border-color: #f2d3a0; }
+    .badge.active { background: #e9f6ff; border-color: #b7dbf5; }
+    .badge.superseded { background: #f5f5f5; border-color: #d5d5d5; }
   </style>
 </head>
 <body>
   <h1><a href="/">Secure Decision</a> <span class="muted">v0.1</span></h1>
+  <div class="muted" style="margin-bottom: 8px;">
+    {% if current_user %}
+      Signed in as <strong>{{ current_user.username }}</strong>
+      <form method="post" action="/logout" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <button type="submit">Logout</button>
+      </form>
+    {% else %}
+      <a href="/login">Login</a>
+    {% endif %}
+  </div>
+  <nav class="top-nav">
+    <a href="/">Home</a>
+    <a href="/decisions">Decisions</a>
+    <a href="/threat-lite">Threat Modeling Lite</a>
+    <a href="/kb">Knowledge Base</a>
+    {% if current_user %}
+      <a href="/mentions">Mentions</a>
+    {% endif %}
+    {% if current_user %}
+      <a href="/admin/users">Users</a>
+    {% endif %}
+  </nav>
   <hr />
+  {% if flash %}
+    <div class="card" style="border-left: 4px solid #4a7;">
+      <strong>{{ flash.level|upper }}</strong> — {{ flash.message }}
+    </div>
+  {% endif %}
   {% block content %}{% endblock %}
 </body>
 </html>

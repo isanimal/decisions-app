@@ -1,0 +1,61 @@
+id: "MK-0003"
+version: "1.0"
+title: "Feature flag sementara menjadi permanen"
+decision_pattern: "Ini sementara saja, nanti dibersihkan."
+summary: "Flag sementara yang bertahan lama sering membuka jalur akses atau state yang tidak lagi dievaluasi."
+
+tags:
+  assumption: ["temporary_fix"]
+  boundary: ["client_to_backend"]
+  failure_mode: ["fail_open"]
+  control: ["integrity", "logging"]
+
+risk:
+  outcomes:
+    - "Integrity: akses tak terduga ke jalur lama"
+    - "Availability: state konflik saat rollout"
+  threat_scenarios:
+    - "Attacker memanfaatkan flag lama untuk akses fitur tersembunyi"
+    - "State lama tidak terproteksi karena tidak diaudit ulang"
+
+mitigation_tiers:
+  minimal:
+    goal: "Pastikan flag tidak abadi."
+    actions:
+      - "Tambahkan expiry date dan owner pada setiap flag"
+      - "Catat decision note alasan flag dibuat"
+  standard:
+    goal: "Flag terkelola dan dievaluasi."
+    actions:
+      - "Audit berkala flag aktif"
+      - "Nonaktifkan flag yang melewati expiry"
+      - "Standarkan perilaku default saat flag off"
+  mature:
+    goal: "Governance flag sebagai bagian lifecycle."
+    actions:
+      - "Automated enforcement expiry"
+      - "Post-release review untuk flag removal"
+      - "Decision archive untuk histori flag"
+
+tradeoffs:
+  effort: "low-to-medium"
+  complexity: "bertambah saat automation"
+  performance: "minimal"
+  ux_impact: "minimal"
+
+verification_ideas:
+  - "Cek tidak ada flag tanpa expiry"
+  - "Uji perilaku sistem saat flag off/on konsisten"
+
+anti_patterns:
+  - "Flag tanpa owner"
+  - "Flag dipakai sebagai permanent switch"
+
+references:
+  owasp_asvs: []
+  owasp_samm: ["Design"]
+  owasp_wstg: []
+
+notes:
+  last_updated: "2026-02-06"
+  contributors: ["aditya"]

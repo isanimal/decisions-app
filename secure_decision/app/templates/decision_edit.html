@@ -1,7 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
   <h2>Edit Decision</h2>
+  {% if d.status|upper == "SUPERSEDED" %}
+    <p class="muted">This decision is superseded and read-only.</p>
+    <p><a href="/decisions/{{ d.id }}">Back to decision</a></p>
+  {% else %}
+  {% if d.status|upper == "ACTIVE" %}
+    <div class="card">
+      <strong>Active decision warning</strong>
+      <p class="muted">Edits to ACTIVE decisions create a revision entry.</p>
+    </div>
+  {% endif %}
   <form method="post" action="/decisions/{{d.id}}/edit">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
     <label>Change summary (for history)</label>
     <input type="text" name="change_summary" value="Updated decision" />
 
@@ -12,10 +23,15 @@
     <textarea name="context">{{ d.context }}</textarea>
 
     <label>Status</label>
+    {% if role == "ADMIN" %}
     <select name="status">
-      <option value="draft" {% if d.status == "draft" %}selected{% endif %}>draft</option>
-      <option value="active" {% if d.status == "active" %}selected{% endif %}>active</option>
+      <option value="DRAFT" {% if d.status|upper == "DRAFT" %}selected{% endif %}>DRAFT</option>
+      <option value="ACTIVE" {% if d.status|upper == "ACTIVE" %}selected{% endif %}>ACTIVE</option>
     </select>
+    {% else %}
+    <div class="muted">Only admins can change status. Current: {{ d.status|upper }}</div>
+    <input type="hidden" name="status" value="{{ d.status|upper }}" />
+    {% endif %}
 
     <h3>Decision Statement</h3>
 
@@ -36,4 +52,5 @@
 
     <p><button type="submit">Save changes</button></p>
   </form>
+  {% endif %}
 {% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Threat Modeling Lite</h2>
+  <p style="max-width: 780px;">
+    Ini bukan threat modeling formal. Tujuannya membuat asumsi dan batas kepercayaan terlihat,
+    lalu memilih outcome: accept / change / compensate.
+  </p>
+
+  <div class="card">
+    <h3>Decision: {{ decision.title }}</h3>
+    <p><small>ID: {{ decision.id }}</small></p>
+  </div>
+
+  <form method="post" action="/decisions/{{ decision.id }}/threat-lite/new">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <div class="card">
+      <h3>Mode</h3>
+      <label>
+        <input type="checkbox" name="guided_mode" checked />
+        Guided mode (prompts and required rationale for change/compensate)
+      </label>
+      <p class="muted">Free mode will still save the same fields, but prompts are lighter.</p>
+    </div>
+    <div class="card">
+      <h3>Step 1 — Context</h3>
+      <p><small>Prompt: Siapa pengguna fitur ini? Exposure-nya apa? Baru/legacy?</small></p>
+      <p class="muted">Example: internal admin tool with limited user base, but high privileges.</p>
+      <textarea name="context_summary" rows="4" style="width: 100%;" required></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Step 2 — Assumptions</h3>
+      <p><small>Prompt: Apa yang Anda anggap benar agar fitur ini aman/berjalan sesuai ekspektasi?</small></p>
+      <p class="muted">Example: all callers are authenticated and requests come only from internal network.</p>
+      <textarea name="assumptions" rows="4" style="width: 100%;" required></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Step 3 — Stress test assumptions</h3>
+      <p><small>Prompt: Jika asumsi Anda salah, apa yang terjadi? Sistem fail-open atau fail-safe?</small></p>
+      <p class="muted">Example: if auth fails open, can attacker reach privileged actions?</p>
+      <textarea name="assumption_stress_test" rows="4" style="width: 100%;" required></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Step 4 — Boundary & Trust shift</h3>
+      <p><small>Prompt: Di titik mana data/aksi berpindah konteks? Di mana kepercayaan berubah?</small></p>
+      <p class="muted">Example: from user input to internal service; from one tenant to another.</p>
+      <textarea name="boundaries_trust" rows="4" style="width: 100%;" required></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Step 5 — Realistic threat scenarios</h3>
+      <p><small>Prompt: Skenario penyalahgunaan paling masuk akal dan “murah” apa?</small></p>
+      <p class="muted">Example: replaying an internal token or abusing an over-privileged endpoint.</p>
+      <textarea name="threat_scenarios" rows="4" style="width: 100%;" required></textarea>
+    </div>
+
+    <div class="card">
+      <h3>Step 6 — Reflection</h3>
+      <p><small>Prompt: Apakah decision awal masih masuk akal? Pilih outcome, lalu tulis alasan.</small></p>
+      <p class="muted">Example: accept with guardrails, or change scope and require additional checks.</p>
+
+      <label for="reflection_outcome"><strong>Outcome</strong></label><br/>
+      <select name="reflection_outcome" id="reflection_outcome" required>
+        <option value="accept">accept (tetap)</option>
+        <option value="change">change (ubah decision)</option>
+        <option value="compensate">compensate (terima tapi tambah guardrail)</option>
+      </select>
+
+      <div style="margin-top: 10px;">
+        <label for="reflection_notes"><strong>Notes</strong></label><br/>
+        <textarea name="reflection_notes" id="reflection_notes" rows="4" style="width: 100%;"></textarea>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <label for="reflection_rationale"><strong>Rationale</strong> <small>(required for change/compensate in guided mode)</small></label><br/>
+        <textarea name="reflection_rationale" id="reflection_rationale" rows="3" style="width: 100%;"></textarea>
+      </div>
+
+      <div style="margin-top: 10px;">
+        <label for="tags"><strong>Tags</strong> <small>(opsional, contoh: internal_only, trusted_service)</small></label><br/>
+        <input type="text" name="tags" id="tags" style="width: 100%;" placeholder="comma,separated,tags" />
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 10px; margin-top: 12px;">
+      <button type="submit">Save Threat Modeling Lite</button>
+      <a href="/decisions/{{ decision.id }}">Cancel</a>
+    </div>
+  </form>
+{% endblock %}

@@ -22,7 +22,12 @@ def normalize_decisions(payload: dict[str, Any]) -> list[dict[str, Any]]:
     return [payload["decision"]]
 
 
-def import_decisions(db: Session, payload: dict[str, Any]) -> dict[str, Any]:
+def import_decisions(
+    db: Session,
+    payload: dict[str, Any],
+    team_id: int | None = None,
+    created_by: int | None = None,
+) -> dict[str, Any]:
     validate_payload(payload)
     items = normalize_decisions(payload)
 
@@ -32,9 +37,12 @@ def import_decisions(db: Session, payload: dict[str, Any]) -> dict[str, Any]:
         stmt = item.get("statement", {})
 
         d = Decision(
+            team_id=team_id,
+            created_by=created_by,
+            updated_by=created_by,
             title=item.get("title", "").strip(),
             context=item.get("context", "").strip(),
-            status="draft",  # ALWAYS draft on import
+            status="DRAFT",  # ALWAYS draft on import
             technical_goal=stmt.get("technical_goal", ""),
             assumptions=stmt.get("assumptions", ""),
             conscious_simplifications=stmt.get("conscious_simplifications", ""),

@@ -2,6 +2,7 @@
 {% block content %}
   <h2>Create Decision</h2>
   <form method="post" action="/decisions/new">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
     <label>Title</label>
     <input type="text" name="title" required />
 
@@ -9,10 +10,15 @@
     <textarea name="context"></textarea>
 
     <label>Status</label>
+    {% if role == "ADMIN" %}
     <select name="status">
-      <option value="draft">draft</option>
-      <option value="active">active</option>
+      <option value="DRAFT" selected>DRAFT</option>
+      <option value="ACTIVE">ACTIVE</option>
     </select>
+    {% else %}
+    <div class="muted">Only admins can set status. New decisions start as DRAFT.</div>
+    <input type="hidden" name="status" value="DRAFT" />
+    {% endif %}
 
     <h3>Decision Statement</h3>
 

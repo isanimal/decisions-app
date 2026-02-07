@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Decision Compare</h2>
+<div class="card">
+  <div><strong>{{ d.title }}</strong></div>
+  <div class="muted">Decision ID: {{ d.id }}</div>
+  <div style="margin-top: 6px;">
+    <a href="/decisions/{{ d.id }}/history">Back to History</a>
+    <a href="/decisions/{{ d.id }}">Back to Decision</a>
+  </div>
+</div>
+
+<div class="card">
+  <div><strong>Left</strong></div>
+  <div class="muted">
+    {% if left_rev %}
+      Revision {{ left_rev.id }} — {{ left_rev.changed_at }} — {{ left_rev.change_summary }}
+    {% else %}
+      Current
+    {% endif %}
+  </div>
+  <pre style="white-space: pre-wrap;">{{ left_snapshot }}</pre>
+</div>
+
+<div class="card">
+  <div><strong>Right</strong></div>
+  <div class="muted">
+    {% if right_rev %}
+      Revision {{ right_rev.id }} — {{ right_rev.changed_at }} — {{ right_rev.change_summary }}
+    {% else %}
+      Current
+    {% endif %}
+  </div>
+  <pre style="white-space: pre-wrap;">{{ right_snapshot }}</pre>
+</div>
+
+<div class="card">
+  <div><strong>Diff</strong></div>
+  {% if diff_lines and diff_lines|length > 0 %}
+    <pre style="white-space: pre-wrap;">{% for line in diff_lines %}{{ line }}
+{% endfor %}</pre>
+  {% else %}
+    <p class="muted">No differences found.</p>
+  {% endif %}
+</div>
+{% endblock %}

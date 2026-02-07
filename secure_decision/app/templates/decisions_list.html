@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Decisions</h2>
+<form method="get" action="/decisions" class="card">
+  <label for="status">Filter by status</label>
+  <select name="status" id="status">
+    <option value="" {% if not status_filter %}selected{% endif %}>All</option>
+    <option value="DRAFT" {% if status_filter == "DRAFT" %}selected{% endif %}>DRAFT</option>
+    <option value="ACTIVE" {% if status_filter == "ACTIVE" %}selected{% endif %}>ACTIVE</option>
+    <option value="SUPERSEDED" {% if status_filter == "SUPERSEDED" %}selected{% endif %}>SUPERSEDED</option>
+  </select>
+  <label for="archived">Include archived</label>
+  <select name="archived" id="archived">
+    <option value="0" {% if not include_archived %}selected{% endif %}>No</option>
+    <option value="1" {% if include_archived %}selected{% endif %}>Yes</option>
+  </select>
+  <div style="margin-top: 10px;">
+    <button type="submit">Apply Filter</button>
+  </div>
+</form>
+<p>
+  {% if role in ["ADMIN", "MEMBER"] %}
+    <a href="/decisions/new">Create a new decision</a>
+  {% endif %}
+  {% if role == "ADMIN" %}
+    <a href="/export/decisions.json">Export all (JSON)</a>
+  {% endif %}
+</p>
+
+{% for d in decisions %}
+<div class="card">
+  <div>
+    <a href="/decisions/{{ d.id }}"><strong>{{ d.title }}</strong></a>
+    {% if d.status|upper == "DRAFT" %}
+      <span class="badge draft">DRAFT</span>
+    {% elif d.status|upper == "ACTIVE" %}
+      <span class="badge active">ACTIVE</span>
+    {% elif d.status|upper == "SUPERSEDED" %}
+      <span class="badge superseded">SUPERSEDED</span>
+    {% endif %}
+    {% if d.archived %}
+      <span class="badge superseded">ARCHIVED</span>
+    {% endif %}
+  </div>
+  <div class="muted">status: {{ d.status }} • updated: {{ d.updated_at }}</div>
+  <div style="margin-top: 6px;">
+    <a href="/decisions/{{ d.id }}/threat-lite">Threat Modeling Lite</a>
+  </div>
+</div>
+{% else %}
+<p>No decisions yet.</p>
+{% endfor %}
+{% endblock %}

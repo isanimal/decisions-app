@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Threat Modeling Lite</h2>
+
+  <div class="card">
+    <h3>Decision: {{ decision.title }}</h3>
+    <p><small>Decision ID: {{ decision.id }} • ThreatLite ID: {{ t.id }}</small></p>
+    <p><strong>Outcome:</strong> {{ t.reflection_outcome }}</p>
+    <p class="muted"><strong>Guided mode:</strong> {{ "Yes" if t.guided_mode else "No" }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Step 1 — Context</h3>
+    <pre style="white-space: pre-wrap;">{{ t.context_summary }}</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 2 — Assumptions</h3>
+    <pre style="white-space: pre-wrap;">{{ t.assumptions }}</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 3 — Stress test assumptions</h3>
+    <pre style="white-space: pre-wrap;">{{ t.assumption_stress_test }}</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 4 — Boundary & Trust shift</h3>
+    <pre style="white-space: pre-wrap;">{{ t.boundaries_trust }}</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 5 — Realistic threat scenarios</h3>
+    <pre style="white-space: pre-wrap;">{{ t.threat_scenarios }}</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 6 — Reflection notes</h3>
+    <pre style="white-space: pre-wrap;">{{ t.reflection_notes }}</pre>
+    {% if t.reflection_rationale %}
+      <p><small><strong>Rationale:</strong> {{ t.reflection_rationale }}</small></p>
+    {% endif %}
+    {% if t.tags %}
+      <p><small><strong>Tags:</strong> {{ t.tags }}</small></p>
+    {% endif %}
+  </div>
+
+  <div style="display:flex; gap:10px; margin-top: 12px;">
+    <a href="/decisions/{{ decision.id }}">Back to Decision</a>
+    {% if current_user %}
+      <a href="/decisions/{{ decision.id }}/threat-lite/{{ t.id }}/edit">Edit</a>
+      <form method="post" action="/decisions/{{ decision.id }}/threat-lite/{{ t.id }}/archive" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <button type="submit">Archive</button>
+      </form>
+      <form method="post" action="/decisions/{{ decision.id }}/threat-lite/{{ t.id }}/delete" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <input type="text" name="confirm" placeholder="DELETE" />
+        <button type="submit">Delete</button>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

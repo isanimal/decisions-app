@@ -1,15 +1,70 @@
-{% extends "base.html" %} {% block content %}
+{% extends "base.html" %}
+{% block content %}
+{% include "components/action_menu.html" %}
 <div class="card">
   <h2>{{ d.title }}</h2>
   <div class="muted">
-    status: {{ d.status }} • created: {{ d.created_at }} • updated: {{
-    d.updated_at }}
+    status: {{ d.status|upper }} • created: {{ d.created_at }} • updated: {{ d.updated_at }}
+  </div>
+  <div style="margin-top: 6px;">
+    {% if d.status|upper == "DRAFT" %}
+      <span class="badge draft">DRAFT</span>
+    {% elif d.status|upper == "ACTIVE" %}
+      <span class="badge active">ACTIVE</span>
+    {% elif d.status|upper == "SUPERSEDED" %}
+      <span class="badge superseded">SUPERSEDED</span>
+    {% endif %}
+    {% if d.archived %}
+      <span class="badge superseded">ARCHIVED</span>
+    {% endif %}
+    {% if d.superseded_by_id %}
+      <span class="muted">Superseded by</span>
+      <a href="/decisions/{{ d.superseded_by_id }}">Decision {{ d.superseded_by_id }}</a>
+    {% endif %}
   </div>
   <p>
-    <a href="/decisions/{{d.id}}/edit">Edit</a>
-    <a href="/decisions/{{d.id}}.json">Export JSON</a>
+    {% if d.status|upper != "SUPERSEDED" and role in ["ADMIN", "MEMBER"] %}
+      <a href="/decisions/{{ d.id }}/edit">Edit</a>
+    {% endif %}
+    <a href="/decisions/{{ d.id }}/export.json">Export JSON</a>
+    <a href="/decisions/{{ d.id }}/history">History</a>
   </p>
+  <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+    {% if d.status|upper == "DRAFT" %}
+      {% if role == "ADMIN" %}
+      <form method="post" action="/decisions/{{ d.id }}/activate">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <button type="submit">Activate</button>
+      </form>
+      {% else %}
+      <span class="muted">Only admins can activate decisions.</span>
+      {% endif %}
+    {% elif d.status|upper == "ACTIVE" %}
+      {% if role == "ADMIN" %}
+      <form method="post" action="/decisions/{{ d.id }}/supersede">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <label for="superseded_by_id">Superseded by (optional)</label>
+        <input type="text" name="superseded_by_id" id="superseded_by_id" placeholder="Decision ID" />
+        <button type="submit">Supersede</button>
+      </form>
+      {% else %}
+      <span class="muted">Only admins can supersede decisions.</span>
+      {% endif %}
+    {% elif d.status|upper == "SUPERSEDED" %}
+      <a href="/decisions/new">Create New Decision</a>
+    {% endif %}
+  </div>
+</div>
 
+<div class="stepper">
+  <div class="step done">Step 1 Decision ✅</div>
+  <div class="step {% if threat_lite_latest and threat_lite_latest|length > 0 %}done{% else %}current{% endif %}">
+    Step 2 Threat Modeling Lite
+  </div>
+  <div class="step">Step 3 Mitigation Match (Optional)</div>
+</div>
+
+<div class="card">
   <h3>Context</h3>
   <pre>{{ d.context }}</pre>
 
@@ -26,6 +81,69 @@
   <pre>{{ d.accepted_worst_case }}</pre>
 </div>
 
+<div class="card">
+  <h3>Threat Modeling Lite</h3>
+  <p>
+    <small>Artefak refleksi: context → assumptions → boundary → threat → reflection.</small>
+  </p>
+
+  <div style="display: flex; gap: 10px; margin-bottom: 10px">
+    {% if role in ["ADMIN", "MEMBER"] %}
+      <a href="/decisions/{{ d.id }}/threat-lite/new">+ New Threat Modeling Lite</a>
+    {% endif %}
+    <a href="/decisions/{{ d.id }}/threat-lite">View All</a>
+    {% if threat_lite_latest and threat_lite_latest|length > 0 %}
+      <a href="/kb?decision_id={{ d.id }}">Match Mitigations (KB)</a>
+    {% endif %}
+  </div>
+
+  {% if threat_lite_latest and threat_lite_latest|length > 0 %}
+  <table style="width: 100%; border-collapse: collapse">
+    <thead>
+      <tr>
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Created</th>
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Outcome</th>
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Link</th>
+        {% if role in ["ADMIN", "MEMBER"] %}
+        <th style="text-align: left; border-bottom: 1px solid #ddd; padding: 6px">Actions</th>
+        {% endif %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for t in threat_lite_latest %}
+      <tr>
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          {{ t.created_at.strftime("%Y-%m-%d %H:%M") if t.created_at else "" }}
+        </td>
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          {{ t.reflection_outcome }}
+        </td>
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          <a href="/decisions/{{ d.id }}/threat-lite/{{ t.id }}">View</a>
+        </td>
+        {% if role in ["ADMIN", "MEMBER"] %}
+        <td style="padding: 6px; border-bottom: 1px solid #eee">
+          <a href="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/edit">Edit</a>
+          <form method="post" action="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/archive" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <button type="submit">Archive</button>
+          </form>
+          <form method="post" action="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/delete" style="display:inline;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+            <input type="text" name="confirm" placeholder="DELETE" />
+            <button type="submit">Delete</button>
+          </form>
+        </td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p><small>Belum ada Threat Modeling Lite untuk decision ini.</small></p>
+  {% endif %}
+</div>
+
 <h3>History (latest 10)</h3>
 {% for r in revisions %}
 <div class="card">
@@ -34,7 +152,33 @@
 </div>
 {% else %}
 <p class="muted">
-  No history yet. (History is created when an active decision is meaningfully
-  updated.)
+  No history yet. (History is created when an active decision is meaningfully updated.)
 </p>
-{% endfor %} {% endblock %}
+{% endfor %}
+
+<h3>Comments</h3>
+{% if role in ["ADMIN", "MEMBER"] %}
+  <form method="post" action="/decisions/{{ d.id }}/comments" class="card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+    <label>New comment</label>
+    <textarea name="body" placeholder="Write a comment. Use @username to mention." required></textarea>
+    <p><button type="submit">Post Comment</button></p>
+  </form>
+{% else %}
+  <p class="muted">You have read-only access. Comments are disabled.</p>
+{% endif %}
+
+{% if comments and comments|length > 0 %}
+  {% for c, author in comments %}
+  <div class="card">
+    <div><strong>{{ author.username }}</strong> <span class="muted">• {{ c.created_at }}</span></div>
+    <pre style="white-space: pre-wrap;">{{ c.body }}</pre>
+    {% if comment_mentions.get(c.id) %}
+      <div class="muted">Mentions: {% for u in comment_mentions.get(c.id) %}@{{ u }} {% endfor %}</div>
+    {% endif %}
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="muted">No comments yet.</p>
+{% endif %}
+{% endblock %}

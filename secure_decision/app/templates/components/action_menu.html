@@ -1,0 +1,46 @@
+<div class="card">
+  <h3>Action Menu</h3>
+  <div><strong>Decision</strong></div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+    {% if role in ["ADMIN", "MEMBER"] %}
+      <a href="/decisions/{{ d.id }}/edit">Edit</a>
+    {% endif %}
+    {% if role == "ADMIN" %}
+      <form method="post" action="/decisions/{{ d.id }}/archive" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <button type="submit">Archive</button>
+      </form>
+      <form method="post" action="/decisions/{{ d.id }}/delete" style="display:inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <label class="muted" style="margin-right:6px;">Type DELETE</label>
+        <input type="text" name="confirm" placeholder="DELETE" />
+        <button type="submit">Delete</button>
+      </form>
+    {% endif %}
+  </div>
+
+  <div><strong>Threat Modeling Lite</strong></div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+    {% if role in ["ADMIN", "MEMBER"] %}
+      <a href="/decisions/{{ d.id }}/threat-lite/new">New assessment</a>
+    {% endif %}
+    <a href="/decisions/{{ d.id }}/threat-lite">View all assessments</a>
+  </div>
+
+  <div><strong>Export</strong></div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+    <a href="/decisions/{{ d.id }}/export.json">Export JSON</a>
+    <a href="/decisions/{{ d.id }}/export">Export Cards</a>
+    <span class="muted">Copy as Markdown (optional)</span>
+  </div>
+
+  <div><strong>Knowledge Base</strong></div>
+  <div style="display:flex; gap:10px; flex-wrap:wrap;">
+    <a href="/kb/status">KB Status</a>
+    {% if threat_lite_latest and threat_lite_latest|length > 0 %}
+      <a href="/kb?decision_id={{ d.id }}">Match mitigations</a>
+    {% else %}
+      <span class="muted">Match mitigations (needs threat-lite)</span>
+    {% endif %}
+  </div>
+</div>

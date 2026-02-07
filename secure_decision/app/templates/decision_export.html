@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Decision Export (Cards)</h2>
+
+<div class="card">
+  <h3>{{ d.title }}</h3>
+  <div class="muted">ID: {{ d.id }} • status: {{ d.status }}{% if d.archived %} • archived{% endif %}</div>
+  <h4>Context</h4>
+  <pre>{{ d.context }}</pre>
+  <h4>Decision Statement</h4>
+  <pre>technical_goal: {{ d.technical_goal }}</pre>
+  <pre>assumptions: {{ d.assumptions }}</pre>
+  <pre>conscious_simplifications: {{ d.conscious_simplifications }}</pre>
+  <pre>non_negotiables: {{ d.non_negotiables }}</pre>
+  <pre>accepted_worst_case: {{ d.accepted_worst_case }}</pre>
+</div>
+
+<h3>Threat Modeling Lite</h3>
+{% for t in threat_lite %}
+<div class="card">
+  <div class="muted">ThreatLite ID: {{ t.id }} • outcome: {{ t.reflection_outcome }}{% if t.archived %} • archived{% endif %}</div>
+  <pre>context_summary: {{ t.context_summary }}</pre>
+  <pre>assumptions: {{ t.assumptions }}</pre>
+  <pre>assumption_stress_test: {{ t.assumption_stress_test }}</pre>
+  <pre>boundaries_trust: {{ t.boundaries_trust }}</pre>
+  <pre>threat_scenarios: {{ t.threat_scenarios }}</pre>
+  <pre>reflection_notes: {{ t.reflection_notes }}</pre>
+  <pre>reflection_rationale: {{ t.reflection_rationale }}</pre>
+  <pre>tags: {{ t.tags }}</pre>
+</div>
+{% else %}
+<p class="muted">No Threat Modeling Lite records.</p>
+{% endfor %}
+
+<h3>Revisions</h3>
+{% for r in revisions %}
+<div class="card">
+  <div><strong>{{ r.changed_at }}</strong> — {{ r.change_summary }}</div>
+  <div class="muted">changed: {{ r.changed_fields }}</div>
+  <pre>{{ r.before_snapshot }}</pre>
+  <pre>{{ r.after_snapshot }}</pre>
+</div>
+{% else %}
+<p class="muted">No revisions.</p>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,69 @@
+id: "MK-0001"
+version: "1.0"
+title: "Internal-only API tanpa autentikasi/otorisasi"
+decision_pattern: "Endpoint ini internal-only, jadi auth tidak perlu ketat."
+summary: "Asumsi internal-only sering gagal ketika terjadi lateral movement, salah konfigurasi network, atau service compromised."
+
+tags:
+  assumption: ["internal_only", "trusted_network", "trusted_service"]
+  boundary: ["service_to_service"]
+  failure_mode: ["fail_open"]
+  control: ["authn", "authz", "logging"]
+
+risk:
+  outcomes:
+    - "Integrity: perubahan data tanpa otorisasi"
+    - "Confidentiality: pembacaan data internal"
+    - "Availability: abuse endpoint untuk DoS internal"
+  threat_scenarios:
+    - "Service internal compromised lalu memanggil endpoint tanpa kontrol"
+    - "Misconfiguration network membuka akses internal dari environment lain"
+    - "Attacker melakukan pivot/lateral movement dan memanfaatkan endpoint tanpa auth"
+
+mitigation_tiers:
+  minimal:
+    goal: "Pastikan akses minimal terkontrol tanpa redesign besar."
+    actions:
+      - "Gunakan shared secret/token antar service (service token) dan verifikasi di setiap request"
+      - "Default deny: blokir request tanpa kredensial yang valid"
+      - "Tambahkan audit log event penting (who/what/when) untuk endpoint ini"
+  standard:
+    goal: "Buat kontrol akses konsisten dan terukur."
+    actions:
+      - "Gunakan identitas service + scope yang jelas (scoped authorization) untuk action sensitif"
+      - "Pisahkan permission per operasi (read/write/admin) dan enforce di handler"
+      - "Terapkan rotation untuk secret/token dan prosedur revoke"
+      - "Tambahkan rate limiting untuk mencegah abuse internal"
+  mature:
+    goal: "Internal tidak otomatis dipercaya; kontrol berbasis policy dan verifikasi berkelanjutan."
+    actions:
+      - "Gunakan strong service identity (mis. mTLS/service identity) dan policy berbasis scope"
+      - "Terapkan prinsip zero trust internal: autentikasi/otorisasi tetap wajib di boundary"
+      - "Audit trail terstruktur + alerting berbasis pattern penyalahgunaan"
+      - "Lakukan review berkala atas asumsi internal-only (decision review cadence)"
+
+tradeoffs:
+  effort: "medium"
+  complexity: "standard naik kompleksitas, mature butuh koordinasi lintas tim"
+  performance: "minimal rendah, standard/mature menambah overhead autentikasi"
+  ux_impact: "minimal"
+
+verification_ideas:
+  - "Uji bahwa request tanpa kredensial selalu ditolak (default deny)"
+  - "Uji token/credential yang sudah di-revoke tidak bisa dipakai"
+  - "Simulasikan service compromised: pastikan scope membatasi aksi destruktif"
+  - "Verifikasi audit log menghasilkan event bermakna untuk investigasi"
+
+anti_patterns:
+  - "Mengandalkan IP allowlist saja sebagai satu-satunya kontrol"
+  - "Menganggap 'di VPC aman' tanpa mekanisme identitas dan otorisasi"
+  - "Membiarkan endpoint admin tanpa kontrol karena 'internal'"
+
+references:
+  owasp_asvs: ["V2", "V4"]   # Anda bisa refine ke section spesifik belakangan
+  owasp_samm: ["Design", "Implementation"]
+  owasp_wstg: ["WSTG-ATHN", "WSTG-ATHZ"]
+
+notes:
+  last_updated: "2026-02-06"
+  contributors: ["aditya", "gsteam"]

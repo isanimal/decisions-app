@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Decision History</h2>
+<div class="card">
+  <div><strong>{{ d.title }}</strong></div>
+  <div class="muted">Decision ID: {{ d.id }}</div>
+  <div style="margin-top: 6px;">
+    <a href="/decisions/{{ d.id }}">Back to Decision</a>
+  </div>
+</div>
+
+{% if revisions and revisions|length > 0 %}
+  <form method="get" action="/decisions/{{ d.id }}/compare" class="card">
+    <label for="from_id">Compare from</label>
+    <select name="from_id" id="from_id">
+      <option value="">Current</option>
+      {% for r in revisions %}
+        <option value="{{ r.id }}">{{ r.changed_at }} — {{ r.change_summary }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="to_id">Compare to</label>
+    <select name="to_id" id="to_id">
+      <option value="">Current</option>
+      {% for r in revisions %}
+        <option value="{{ r.id }}">{{ r.changed_at }} — {{ r.change_summary }}</option>
+      {% endfor %}
+    </select>
+    <div style="margin-top: 10px;">
+      <button type="submit">Compare</button>
+    </div>
+  </form>
+
+  {% for r in revisions %}
+  <div class="card">
+    <div><strong>{{ r.changed_at }}</strong> — {{ r.change_summary }}</div>
+    <div class="muted">changed: {{ r.changed_fields }}</div>
+    <div style="margin-top: 6px;">
+      <a href="/decisions/{{ d.id }}/compare?from_id={{ r.id }}">Compare from this</a>
+      <a href="/decisions/{{ d.id }}/compare?to_id={{ r.id }}">Compare to this</a>
+    </div>
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="muted">No revisions yet.</p>
+{% endif %}
+{% endblock %}

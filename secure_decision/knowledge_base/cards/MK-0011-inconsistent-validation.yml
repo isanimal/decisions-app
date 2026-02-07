@@ -1,0 +1,68 @@
+id: "MK-0011"
+version: "1.0"
+title: "Validasi input tidak konsisten antar endpoint/komponen"
+decision_pattern: "Yang penting jalan dulu; validasi nanti menyusul atau tiap dev punya cara masing-masing."
+summary: "Inconsistency menciptakan bypass path: attacker mencari jalur dengan validasi paling lemah."
+
+tags:
+  assumption: ["trusted_input"]
+  boundary: ["user_to_api", "api_to_db"]
+  failure_mode: ["verbose_error"]
+  control: ["validation", "error_handling", "logging"]
+
+risk:
+  outcomes:
+    - "Integrity: bypass aturan bisnis melalui jalur lemah"
+    - "Confidentiality: error detail atau parsing leak"
+    - "Injection risk meningkat karena aturan input tidak seragam"
+  threat_scenarios:
+    - "Attacker memilih endpoint dengan validasi lemah untuk mencapai operasi yang sama"
+    - "Perbedaan canonicalization menyebabkan bypass (mis. encoding/format)"
+    - "Error response berbeda mengungkap detail sistem"
+
+mitigation_tiers:
+  minimal:
+    goal: "Kurangi variasi validasi secepat mungkin."
+    actions:
+      - "Buat helper validasi bersama untuk tipe input kritikal (id, email, amount, role)"
+      - "Terapkan batas dasar (type/length/range) sebelum logika bisnis berjalan"
+      - "Standarkan error response (user-facing generic; internal log detail)"
+  standard:
+    goal: "Validasi jadi kontrak yang konsisten."
+    actions:
+      - "Centralize validation di satu layer (mis. request schema/DTO) sebelum handler"
+      - "Pisahkan validation vs business rules, dan dokumentasikan kontraknya"
+      - "Tambahkan negative test untuk semua endpoint yang memproses operasi serupa"
+      - "Review rutin untuk memastikan aturan sama diterapkan di jalur berbeda"
+  mature:
+    goal: "Validasi berbasis schema/contract dan mudah diaudit."
+    actions:
+      - "Schema-driven validation (kontrak eksplisit) yang digunakan lintas service"
+      - "Automated checks untuk mendeteksi endpoint yang tidak memakai kontrak"
+      - "Decision record saat ada pengecualian validasi (dengan expiry dan owner)"
+      - "Monitoring pola error/abuse untuk menemukan jalur bypass"
+
+tradeoffs:
+  effort: "medium"
+  complexity: "centralization butuh refactor terbatas"
+  performance: "minimal"
+  ux_impact: "minimal-to-low (error lebih konsisten, bisa mempengaruhi UX tapi biasanya positif)"
+
+verification_ideas:
+  - "Cari dua endpoint yang melakukan hal sama, pastikan validasinya identik"
+  - "Uji input encoding/edge-case untuk memastikan tidak ada bypass"
+  - "Pastikan error response ke user tidak mengungkap detail internal"
+
+anti_patterns:
+  - "Validasi hanya di frontend"
+  - "Validasi berbasis 'blacklist' tanpa kontrak yang jelas"
+  - "Mengandalkan try/catch tanpa aturan input"
+
+references:
+  owasp_asvs: ["V5", "V7"]    # placeholder area; refine nanti
+  owasp_samm: ["Implementation", "Verification"]
+  owasp_wstg: ["WSTG-INPV", "WSTG-ERRH"]
+
+notes:
+  last_updated: "2026-02-06"
+  contributors: ["aditya", "gsteam"]

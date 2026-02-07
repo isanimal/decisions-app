@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mitigation Knowledge Base (KB)</h2>
+
+<p class="muted">
+  KB is optional and only helps after Threat Modeling Lite. It does not replace reflection.
+</p>
+
+<div class="card">
+  <label>Decision pattern</label>
+  <input id="kb_decision_pattern" type="text" value="{{ decision_pattern }}" />
+
+  <label>Assumption tags</label>
+  <input id="kb_assumption" type="text" placeholder="internal_only, reuse_code" />
+
+  <label>Boundary tags</label>
+  <input id="kb_boundary" type="text" placeholder="service_to_service, user_to_api" />
+
+  <label>Failure mode tags</label>
+  <input id="kb_failure" type="text" placeholder="fail_open, verbose_error" />
+
+  <label>Control tags</label>
+  <input id="kb_control" type="text" placeholder="authn, authz, validation" />
+
+  <div style="margin-top: 10px;">
+    <button id="kb_btn">Match Mitigations</button>
+  </div>
+</div>
+
+<div id="kb_out"></div>
+
+{% if disabled_kb_ids and disabled_kb_ids|length > 0 %}
+  <div class="card">
+    <strong>Disabled KB cards</strong>
+    <div class="muted">{{ disabled_kb_ids|join(", ") }}</div>
+  </div>
+{% endif %}
+
+<script>
+  function splitTags(s) {
+    return (s || "")
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+
+  function renderCard(result) {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div><strong>${result.title}</strong> <span class="muted">score ${result.score}</span></div>
+      <div class="muted">${(result.why || []).join(", ")}</div>
+      <pre style="white-space: pre-wrap;">${JSON.stringify(result.card || {}, null, 2)}</pre>
+      {% if role == "ADMIN" %}
+      <form method="post" action="/kb/disable/${result.id}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
+        <button type="submit">Disable Card</button>
+      </form>
+      {% endif %}
+    `;
+    return card;
+  }
+
+  document.getElementById("kb_btn").addEventListener("click", async () => {
+    const payload = {
+      decision_pattern: document.getElementById("kb_decision_pattern").value,
+      tags: {
+        assumption: splitTags(document.getElementById("kb_assumption").value),
+        boundary: splitTags(document.getElementById("kb_boundary").value),
+        failure_mode: splitTags(document.getElementById("kb_failure").value),
+        control: splitTags(document.getElementById("kb_control").value),
+      },
+      top_k: 5,
+    };
+
+    const endpoint = "{{ kb_endpoint }}";
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+
+    const json = await res.json();
+    const out = document.getElementById("kb_out");
+    out.innerHTML = "";
+    if (json && json.results && json.results.length > 0) {
+      json.results.forEach((r) => out.appendChild(renderCard(r)));
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "card";
+      empty.textContent = "No matches found.";
+      out.appendChild(empty);
+    }
+  });
+</script>
+{% endblock %}

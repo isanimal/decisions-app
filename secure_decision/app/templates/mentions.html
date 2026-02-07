@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Mentions</h2>
+
+{% if mentions and mentions|length > 0 %}
+  {% for mention, comment, decision, author in mentions %}
+  <div class="card">
+    <div>
+      <strong>@{{ author.username }}</strong>
+      <span class="muted">mentioned you on</span>
+      <a href="/decisions/{{ decision.id }}">Decision {{ decision.id }}</a>
+    </div>
+    <div class="muted">{{ mention.created_at }}</div>
+    <pre style="white-space: pre-wrap;">{{ comment.body }}</pre>
+  </div>
+  {% endfor %}
+{% else %}
+  <p class="muted">No mentions yet.</p>
+{% endif %}
+{% endblock %}

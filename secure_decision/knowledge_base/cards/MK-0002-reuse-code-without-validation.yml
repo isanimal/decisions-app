@@ -1,0 +1,68 @@
+id: "MK-0002"
+version: "1.0"
+title: "Reuse kode/snippet/library tanpa memahami implikasi"
+decision_pattern: "Saya menggunakan kode yang sudah ada tanpa benar-benar memahami implikasinya."
+summary: "Reuse mempercepat delivery, tetapi membawa asumsi tersembunyi: insecure defaults, parsing edge cases, dependency risk."
+
+tags:
+  assumption: ["reuse_code"]
+  boundary: ["third_party"]
+  failure_mode: ["fail_silent"]
+  control: ["integrity", "logging", "validation"]
+
+risk:
+  outcomes:
+    - "Integrity: logic bug dari asumsi snippet"
+    - "Confidentiality: insecure defaults membocorkan data"
+    - "Supply chain: dependency berisiko atau salah versi"
+  threat_scenarios:
+    - "Snippet menangani input tidak lengkap → bypass validasi"
+    - "Library default-nya insecure (mode permissive) dan tidak disadari"
+    - "Dependency diganti/di-takeover/versi rentan digunakan karena tidak dipin"
+
+mitigation_tiers:
+  minimal:
+    goal: "Reuse tetap boleh, tapi asumsi dipaksa terlihat."
+    actions:
+      - "Pin versi dependency (hindari floating/latest tanpa kontrol)"
+      - "Tulis 3 asumsi utama snippet/library ini (input, error, boundary) dalam decision note"
+      - "Tambahkan minimal negative test untuk edge case yang mungkin (input kosong, panjang ekstrem, format salah)"
+  standard:
+    goal: "Reuse jadi praktik yang bisa direview dan dipelihara."
+    actions:
+      - "Buat checklist review dependency (purpose, data handled, default config, update cadence)"
+      - "Lakukan review kecil pada konfigurasi default (secure defaults) sebelum dipakai"
+      - "Definisikan aturan update dependency + siapa owner-nya"
+      - "Catat alasan pemilihan library (decision record) agar bisa dievaluasi ulang"
+  mature:
+    goal: "Provenance dan integritas dependency jadi bagian sistem kerja."
+    actions:
+      - "Bangun inventaris dependency + policy update"
+      - "Gunakan artefak terverifikasi (mis. signed packages/provenance) sesuai kemampuan organisasi"
+      - "Integrasikan evaluasi dependency ke lifecycle perubahan (review + periodic reassessment)"
+      - "Gunakan decision archive untuk mendeteksi pola reuse berisiko lintas proyek"
+
+tradeoffs:
+  effort: "low-to-medium"
+  complexity: "naik saat standard/mature, tapi mengurangi risiko kumulatif"
+  performance: "minimal"
+  ux_impact: "minimal"
+
+verification_ideas:
+  - "Buat test input abnormal yang memaksa snippet gagal aman (fail closed)"
+  - "Audit bahwa versi dependency terpin dan konsisten di build"
+  - "Uji konfigurasi default tidak permissive tanpa sadar"
+
+anti_patterns:
+  - "Copy-paste tanpa memahami boundary dan input assumptions"
+  - "Mengandalkan popularitas GitHub sebagai indikator keamanan"
+  - "Menggunakan 'latest' untuk mempercepat tanpa kontrol"
+
+references:
+  owasp_asvs: ["V1", "V10"]  # placeholder area; refine nanti
+  owasp_samm: ["Implementation", "Verification"]
+  owasp_wstg: ["WSTG-CLNT", "WSTG-CONF"]
+
+notes:
+  last_updated: "2026-02-06"
+  contributors: ["aditya", "gsteam"]

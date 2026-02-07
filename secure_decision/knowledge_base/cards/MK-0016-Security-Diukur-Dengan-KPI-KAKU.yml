@@ -1,0 +1,58 @@
+id: "MK-0016"
+version: "1.0"
+title: "Security diukur dengan KPI kaku"
+decision_pattern: "Kalau angkanya bagus, berarti aman."
+summary: "KPI kaku mendorong gaming metrics dan security theater."
+
+tags:
+  assumption: []
+  boundary: []
+  failure_mode: []
+  control: ["logging", "integrity"]
+
+risk:
+  outcomes:
+    - "False sense of security"
+    - "Perilaku kosmetik"
+  threat_scenarios:
+    - "Tim fokus memenuhi angka, bukan risiko nyata"
+    - "Masalah laten tidak terdeteksi"
+
+mitigation_tiers:
+  minimal:
+    goal: "Ubah fokus ke pembelajaran."
+    actions:
+      - "Diskusi kualitatif atas insiden kecil"
+  standard:
+    goal: "Trend, bukan skor."
+    actions:
+      - "Review tren keputusan"
+      - "Post-mortem tanpa menyalahkan"
+  mature:
+    goal: "Measurement sebagai feedback loop."
+    actions:
+      - "Learning-oriented metrics"
+      - "Maturity tracking berbasis praktik"
+
+tradeoffs:
+  effort: "medium"
+  complexity: "organizational"
+  performance: "n/a"
+  ux_impact: "positif (budaya sehat)"
+
+verification_ideas:
+  - "Apakah metric memicu diskusi atau defensif?"
+  - "Apakah tren dipakai untuk improvement?"
+
+anti_patterns:
+  - "Target angka tanpa konteks"
+  - "Bandingkan tim hanya dari KPI"
+
+references:
+  owasp_asvs: []
+  owasp_samm: ["Governance"]
+  owasp_wstg: []
+
+notes:
+  last_updated: "2026-02-06"
+  contributors: ["aditya"]

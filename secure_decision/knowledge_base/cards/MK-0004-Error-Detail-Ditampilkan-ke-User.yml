@@ -1,0 +1,60 @@
+id: "MK-0004"
+version: "1.0"
+title: "Error detail ditampilkan ke user untuk debugging"
+decision_pattern: "Biar cepat fix, tampilkan error detail ke user."
+summary: "Verbose error mempercepat debugging, tapi membuka informasi sensitif."
+
+tags:
+  assumption: ["debug_leftover"]
+  boundary: ["user_to_api"]
+  failure_mode: ["verbose_error"]
+  control: ["error_handling", "logging"]
+
+risk:
+  outcomes:
+    - "Confidentiality: leak stack trace, query, path"
+    - "Integrity: petunjuk eksploitasi"
+  threat_scenarios:
+    - "Attacker mempelajari struktur sistem dari error"
+    - "Information disclosure mempermudah exploit lanjutan"
+
+mitigation_tiers:
+  minimal:
+    goal: "Pisahkan pesan user dan internal."
+    actions:
+      - "Generic error message ke user"
+      - "Detail error hanya di log internal"
+  standard:
+    goal: "Error terstruktur dan aman."
+    actions:
+      - "Error code konsisten + correlation id"
+      - "Redaction data sensitif di log"
+  mature:
+    goal: "Error sebagai sinyal operasional."
+    actions:
+      - "Policy error handling"
+      - "Alerting berbasis error pattern"
+      - "Review berkala error exposure"
+
+tradeoffs:
+  effort: "low"
+  complexity: "medium saat standard/mature"
+  performance: "minimal"
+  ux_impact: "positif (lebih konsisten)"
+
+verification_ideas:
+  - "Pastikan stack trace tidak muncul ke user"
+  - "Cek log mengandung detail cukup untuk debugging"
+
+anti_patterns:
+  - "Try/catch kosong"
+  - "Expose exception mentah ke client"
+
+references:
+  owasp_asvs: ["V7"]
+  owasp_samm: ["Implementation"]
+  owasp_wstg: ["WSTG-ERRH"]
+
+notes:
+  last_updated: "2026-02-06"
+  contributors: ["aditya"]
