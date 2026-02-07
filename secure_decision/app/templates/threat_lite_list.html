@@ -61,12 +61,12 @@
             <a href="/decisions/{{ t.decision_id }}/threat-lite/{{ t.id }}/edit">Edit</a>
             <form method="post" action="/decisions/{{ t.decision_id }}/threat-lite/{{ t.id }}/archive" style="display:inline;">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-              <button type="submit">Archive</button>
+              <button class="btn warn" type="submit">Archive</button>
             </form>
             <form method="post" action="/decisions/{{ t.decision_id }}/threat-lite/{{ t.id }}/delete" style="display:inline;">
               <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-              <input type="text" name="confirm" placeholder="DELETE" />
-              <button type="submit">Delete</button>
+              <input class="input-short" type="text" name="confirm" placeholder="DELETE" />
+              <button class="btn danger" type="submit">Delete</button>
             </form>
           {% endif %}
         </td>

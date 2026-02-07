@@ -87,7 +87,7 @@
     <small>Artefak refleksi: context → assumptions → boundary → threat → reflection.</small>
   </p>
 
-  <div style="display: flex; gap: 10px; margin-bottom: 10px">
+  <div class="action-row" style="margin-bottom: 10px">
     {% if role in ["ADMIN", "MEMBER"] %}
       <a href="/decisions/{{ d.id }}/threat-lite/new">+ New Threat Modeling Lite</a>
     {% endif %}
@@ -123,16 +123,18 @@
         </td>
         {% if role in ["ADMIN", "MEMBER"] %}
         <td style="padding: 6px; border-bottom: 1px solid #eee">
+          <div class="action-row">
           <a href="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/edit">Edit</a>
-          <form method="post" action="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/archive" style="display:inline;">
+          <form method="post" action="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/archive">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-            <button type="submit">Archive</button>
+            <button class="btn warn" type="submit">Archive</button>
           </form>
-          <form method="post" action="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/delete" style="display:inline;">
+          <form method="post" action="/decisions/{{ d.id }}/threat-lite/{{ t.id }}/delete">
             <input type="hidden" name="csrf_token" value="{{ csrf_token }}" />
-            <input type="text" name="confirm" placeholder="DELETE" />
-            <button type="submit">Delete</button>
+            <input class="input-short" type="text" name="confirm" placeholder="DELETE" />
+            <button class="btn danger" type="submit">Delete</button>
           </form>
+          </div>
         </td>
         {% endif %}
       </tr>

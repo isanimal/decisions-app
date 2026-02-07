@@ -787,6 +787,33 @@ def decision_archive(
     set_flash(request, "Decision archived")
     return RedirectResponse(url="/decisions", status_code=303)
 
+@app.post("/decisions/{decision_id}/unarchive")
+def decision_unarchive(
+    request: Request,
+    decision_id: int,
+    csrf_token: str = Form(""),
+    db: Session = Depends(get_db),
+):
+    user, redirect = ensure_user(request, db)
+    if redirect:
+        return redirect
+    verify_csrf(request, csrf_token)
+    d = db.get(Decision, decision_id)
+    if not d:
+        raise HTTPException(status_code=404, detail="Decision not found")
+    if d.team_id != user.default_team_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    role = get_user_role(db, user, user.default_team_id)
+    if ROLE_ORDER.get(role, 0) < ROLE_ORDER["ADMIN"]:
+        raise HTTPException(status_code=403, detail="Admin only")
+
+    d.archived = False
+    d.updated_by = user.id
+    touch_updated_at(d)
+    db.commit()
+    set_flash(request, "Decision unarchived")
+    return RedirectResponse(url=f"/decisions/{d.id}", status_code=303)
+
 @app.post("/decisions/{decision_id}/delete")
 def decision_delete(
     request: Request,
