@@ -1,0 +1,23 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+env/
+
+# Local app data
+secure_decision/secure_decision.db
+
+# QA docs and helper scripts are kept out of the public repo
+QA_*.md
+scripts/
+secure_decision/scripts/
+secure_decision/knowledge_base/scripts/
+

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from sqlalchemy.orm import Session
 
 from .models import Decision, DecisionRevision
@@ -25,8 +25,8 @@ def normalize_decisions(payload: dict[str, Any]) -> list[dict[str, Any]]:
 def import_decisions(
     db: Session,
     payload: dict[str, Any],
-    team_id: int | None = None,
-    created_by: int | None = None,
+    team_id: Optional[int] = None,
+    created_by: Optional[int] = None,
 ) -> dict[str, Any]:
     validate_payload(payload)
     items = normalize_decisions(payload)

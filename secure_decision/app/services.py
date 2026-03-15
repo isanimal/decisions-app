@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 from sqlalchemy.orm import Session
 
 from .models import Decision, DecisionRevision
@@ -43,8 +44,8 @@ def create_revision_if_needed(
     db: Session,
     before: Decision,
     after: Decision,
-    change_summary: str | None = None,
-    user_id: int | None = None,
+    change_summary: Optional[str] = None,
+    user_id: Optional[int] = None,
 ) -> None:
     """
     v0.1 rule:

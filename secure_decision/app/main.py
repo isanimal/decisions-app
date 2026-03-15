@@ -1,3 +1,4 @@
+from typing import Optional
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -72,12 +73,12 @@ class PWDContext:
 
 pwd_context = PWDContext()
 
-KB: KnowledgeBase | None = None
+KB: Optional[KnowledgeBase] = None
 KB_DISABLED_PATH = Path(__file__).resolve().parent.parent / "knowledge_base" / "disabled.json"
 
 DECISION_STATUSES = {"DRAFT", "ACTIVE", "SUPERSEDED"}
 
-def normalize_status(value: str | None, default: str = "DRAFT") -> str:
+def normalize_status(value: Optional[str], default: str = "DRAFT") -> str:
     s = (value or "").strip().upper()
     if s in DECISION_STATUSES:
         return s
@@ -96,10 +97,10 @@ def get_csrf_token(request: Request) -> str:
 def set_flash(request: Request, message: str, level: str = "success") -> None:
     request.session["flash"] = {"message": message, "level": level}
 
-def pop_flash(request: Request) -> dict | None:
+def pop_flash(request: Request) -> Optional[dict]:
     return request.session.pop("flash", None)
 
-def verify_csrf(request: Request, csrf_token: str | None) -> None:
+def verify_csrf(request: Request, csrf_token: Optional[str]) -> None:
     # For development: allow empty CSRF token or skip strict validation
     # In production, enforce: if not csrf_token or csrf_token != request.session.get("csrf_token")
     if not csrf_token:
@@ -115,7 +116,7 @@ def verify_csrf(request: Request, csrf_token: str | None) -> None:
         request.session["csrf_token"] = csrf_token
     # For development, we don't strictly enforce token matching
 
-def get_current_user_optional(request: Request, db: Session) -> User | None:
+def get_current_user_optional(request: Request, db: Session) -> Optional[User]:
     user_id = request.session.get("user_id")
     if not user_id:
         return None
@@ -130,7 +131,7 @@ def require_login(request: Request, db: Session = Depends(get_db)) -> User:
         raise HTTPException(status_code=401, detail="Login required")
     return user
 
-def get_user_role(db: Session, user: User, team_id: int | None) -> str:
+def get_user_role(db: Session, user: User, team_id: Optional[int]) -> str:
     if not team_id:
         return "VIEWER"
     membership = (
@@ -154,7 +155,7 @@ def require_role(min_role: str):
         return user, role
     return _inner
 
-def render(request: Request, template_name: str, context: dict, user: User | None = None):
+def render(request: Request, template_name: str, context: dict, user: Optional[User] = None):
     ctx = {"request": request, **context}
     ctx["current_user"] = user
     ctx["csrf_token"] = get_csrf_token(request)
@@ -164,7 +165,7 @@ def render(request: Request, template_name: str, context: dict, user: User | Non
 def users_exist(db: Session) -> bool:
     return db.query(User).limit(1).first() is not None
 
-def ensure_user(request: Request, db: Session) -> tuple[User | None, RedirectResponse | None]:
+def ensure_user(request: Request, db: Session) -> tuple[Optional[User], Optional[RedirectResponse]]:
     if not users_exist(db):
         return None, RedirectResponse(url="/setup", status_code=303)
     user = get_current_user_optional(request, db)
@@ -900,7 +901,7 @@ def decision_history(decision_id: int, request: Request, db: Session = Depends(g
         user=user,
     )
 
-def _snapshot_for_compare(db: Session, decision_id: int, revision_id: int | None) -> tuple[str, DecisionRevision | None]:
+def _snapshot_for_compare(db: Session, decision_id: int, revision_id: Optional[int]) -> tuple[str, Optional[DecisionRevision]]:
     if revision_id is None:
         d = db.get(Decision, decision_id)
         if not d:
@@ -928,8 +929,8 @@ def _snapshot_for_compare(db: Session, decision_id: int, revision_id: int | None
 def decision_compare(
     decision_id: int,
     request: Request,
-    from_id: int | None = Query(default=None),
-    to_id: int | None = Query(default=None),
+    from_id: Optional[int] = Query(default=None),
+    to_id: Optional[int] = Query(default=None),
     db: Session = Depends(get_db),
 ):
     user, redirect = ensure_user(request, db)
@@ -1091,7 +1092,7 @@ def decision_activate(
 def decision_supersede(
     request: Request,
     decision_id: int,
-    superseded_by_id: int | None = Form(default=None),
+    superseded_by_id: Optional[int] = Form(default=None),
     csrf_token: str = Form(""),
     db: Session = Depends(get_db),
 ):
@@ -1126,7 +1127,7 @@ def decision_supersede(
 @app.get("/threat-lite", response_class=HTMLResponse)
 def threat_lite_list(
     request: Request,
-    decision_id: int | None = Query(default=None),
+    decision_id: Optional[int] = Query(default=None),
     db: Session = Depends(get_db),
 ):
     user, redirect = ensure_user(request, db)
@@ -1208,7 +1209,7 @@ def threat_lite_list_for_decision(
 @app.get("/kb", response_class=HTMLResponse)
 def kb_page(
     request: Request,
-    decision_id: int | None = Query(default=None),
+    decision_id: Optional[int] = Query(default=None),
     db: Session = Depends(get_db),
 ):
     user, redirect = ensure_user(request, db)
