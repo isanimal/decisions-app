@@ -1,8 +1,9 @@
-# Issue Log: Secure Decision App v0.1
+# Issue Log Template
 
-**Document Purpose**: Track all defects found during QA testing.  
-**Format**: Central issue registry with detailed investigation for each item.  
-**Update Frequency**: After each test session
+Dokumen ini adalah template issue log internal. Ini bukan dokumentasi pengguna akhir.
+
+**Document Purpose**: Track defects found during investigation or QA.  
+**Format**: Central issue registry with detailed investigation for each item.
 
 ---
 

@@ -1,183 +1,69 @@
-# Secure Decision
-**Decision-Oriented Secure Coding**
+# Secure Decision App
 
-## Tentang Proyek Ini
+Dokumen ini khusus untuk setup dan menjalankan aplikasi di folder `secure_decision/`.
 
-Secure Decision adalah proyek open source yang dibuat untuk membantu **lead developer, tech lead, dan tim engineering** membuat keputusan teknis yang lebih sadar, eksplisit, dan dapat diwariskan.
+Untuk memahami filosofi dan dokumentasi proyek, mulai dari [README.md](../README.md).
 
-Proyek ini **bukan** vulnerability scanner.  
-Proyek ini **bukan** alat penilaian keamanan.  
-Proyek ini **bukan** pengganti penilaian profesional.
+## Struktur Folder
 
-Secure Decision hadir untuk menjawab satu pertanyaan mendasar:
+- `app/` source code FastAPI
+- `alembic/` migration database
+- `knowledge_base/` kartu knowledge base dan skema
+- `requirements.txt` dependency aplikasi
+- `alembic.ini` konfigurasi Alembic
 
-> *Bagaimana kita memastikan bahwa keputusan teknis yang kita ambil hari ini dapat dipahami, dipertanggungjawabkan, dan dievaluasi di masa depan?*
+## Menjalankan Aplikasi
 
----
+### 1. Buat virtual environment
 
-## Getting Started
+```bash
+python -m venv .venv
+```
 
-Secure Decision bukan alat yang perlu “dipelajari fiturnya”,  
-tetapi cara berpikir yang perlu **dibaca dan dipahami**.
+### 2. Aktifkan virtual environment
 
-Jika ini pertama kali Anda menggunakan Secure Decision,  
-kami sangat menyarankan urutan berikut:
+macOS/Linux:
 
-1. **[How to Read a Decision](HOW_TO_READ_A_DECISION.md)**  
-   Pelajari cara membaca sebuah decision tanpa menghakimi atau mencari verdict.
+```bash
+source .venv/bin/activate
+```
 
-2. **[How to Write a Good Decision](HOW_TO_WRITE_A_GOOD_DECISION.md)**  
-   Panduan praktis menulis decision yang jujur, kontekstual, dan berguna.
+Windows PowerShell:
 
-3. **[Examples](examples/)**  
-   Lihat contoh decision nyata untuk memahami bagaimana trade-off ditulis secara eksplisit.
+```powershell
+.venv\Scripts\activate
+```
 
-Dokumen-dokumen ini dirancang untuk membantu Anda masuk ke mindset Secure Decision  
-sebelum menggunakan tools atau menulis decision Anda sendiri.
+### 3. Install dependency
 
----
+```bash
+pip install -r requirements.txt
+```
 
-## Masalah yang Kami Sasar
+### 4. Jalankan server
 
-Dalam praktik pengembangan perangkat lunak, banyak keputusan penting terjadi secara implisit:
-- asumsi tidak ditulis
-- penyederhanaan dilakukan karena tekanan waktu
-- ekspektasi hanya hidup di kepala lead atau senior developer
+Dari folder `secure_decision/`:
 
-Ketika sistem berkembang, konteks berubah, atau tim berganti, keputusan-keputusan ini sering hilang.  
-Masalah keamanan yang muncul kemudian diperlakukan sebagai kegagalan teknis, padahal akarnya adalah **keputusan yang tidak pernah dibuat eksplisit**.
+```bash
+uvicorn app.main:app --reload
+```
 
-Secure Decision dibuat untuk membantu mengatasi masalah ini.
+Secara default aplikasi akan berjalan di `http://127.0.0.1:8000`.
 
----
+## Database dan Migration
 
-## Prinsip Dasar
+Project ini menggunakan SQLite untuk pengembangan lokal dan Alembic untuk migration schema.
 
-Proyek ini dibangun di atas prinsip-prinsip berikut:
+Contoh perintah:
 
-- **Keamanan lahir dari keputusan, bukan dari alat**
-- **Asumsi yang tidak ditulis adalah sumber risiko**
-- **Checklist tanpa konteks tidak membangun budaya**
-- **Pengukuran harus mendukung pembelajaran, bukan menghukum**
+```bash
+alembic upgrade head
+```
 
-Karena itu, Secure Decision secara sadar **tidak**:
-- memberikan skor keamanan
-- memberi label “aman” atau “tidak aman”
-- membandingkan tim atau individu
-- memaksakan kepatuhan formal
+Jika Anda perlu meninjau knowledge base, lihat:
 
----
+- [knowledge_base/README.md](knowledge_base/README.md)
 
-## Apa yang Dilakukan Secure Decision
+## Catatan
 
-Secure Decision membantu tim untuk:
-
-- Menuliskan **decision statement** secara eksplisit  
-- Mendefinisikan asumsi, batas kepercayaan, dan penyederhanaan yang disadari  
-- Menyimpan sejarah keputusan untuk keperluan refleksi dan transfer pengetahuan  
-- Memicu diskusi yang lebih sehat dalam review dan perencanaan  
-
-Tools ini berfokus pada **membuat keputusan terlihat**, bukan menilai hasilnya.
-
----
-
-## Untuk Siapa Proyek Ini Dibuat
-
-Secure Decision ditujukan untuk:
-
-- **Tech Lead / Lead Developer**  
-  yang perlu menyelaraskan ekspektasi tim tanpa micro-management
-
-- **Engineering Manager**  
-  yang ingin meningkatkan efektivitas tim tanpa menambah beban administratif
-
-- **Tim Developer Kecil hingga Menengah**  
-  yang membutuhkan kejelasan keputusan, bukan kontrol tambahan
-
-Proyek ini **bukan** ditujukan untuk:
-- organisasi yang mencari compliance otomatis
-- tim yang membutuhkan laporan audit instan
-- penggunaan sebagai alat evaluasi kinerja individu
-
----
-
-## Filosofi Open Source
-
-Secure Decision bersifat **open source secara sadar dan etis**.
-
-Kami percaya bahwa:
-- transparansi membangun kepercayaan
-- logika pengambilan keputusan harus dapat dibaca manusia
-- komunitas berhak menjaga arah filosofis proyek
-
-Kontribusi yang bertentangan dengan prinsip inti proyek—seperti penambahan scoring, ranking, atau KPI—akan **ditolak**, meskipun secara teknis baik.
-
-Ini bukan soal membatasi inovasi, tetapi menjaga integritas tujuan proyek.
-
----
-
-## Struktur Proyek (High-Level)
-
-Proyek ini berfokus pada konsep inti berikut:
-
-- **Decision**  
-  Pernyataan tujuan, asumsi, penyederhanaan, dan risiko
-
-- **History**  
-  Riwayat perubahan keputusan dari waktu ke waktu
-
-- **Reflection**  
-  Pertanyaan yang membantu tim mengevaluasi relevansi keputusan
-
-Detail implementasi bersifat minimal dan dapat berkembang secara bertahap.
-
----
-
-## Hubungan dengan Buku
-
-Secure Decision terinspirasi langsung dari buku:
-
-> **Secure Coding: Cara Berpikir Developer di Dunia Nyata**
-
-Proyek ini adalah **perpanjangan praktis** dari ide-ide dalam buku tersebut, khususnya:
-- keputusan sehari-hari
-- asumsi desain
-- budaya kerja
-- keberlanjutan praktik secure coding
-
-Namun, Secure Decision **dapat digunakan secara mandiri** tanpa membaca buku.
-
----
-
-## Kontribusi
-
-Jika Anda ingin berkontribusi:
-- pahami prinsip inti proyek
-- jelaskan **keputusan apa yang dibantu** oleh kontribusi Anda
-- hormati bahwa proyek ini adalah **decision-support**, bukan security scoring engine
-
-Diskusi lebih dihargai daripada fitur.
-
----
-
-## Penutup
-
-Secure Decision tidak bertujuan membuat developer lebih takut.  
-Ia bertujuan membuat keputusan lebih sadar.
-
-Jika tools ini membantu tim Anda:
-- berdiskusi lebih jujur
-- memahami konteks keputusan lama
-- dan bekerja lebih efektif tanpa menambah tekanan
-
-maka proyek ini telah menjalankan fungsinya.
-
----
-
-### Status
-
-README ini adalah **dokumen filosofis utama** proyek.  
-Jika suatu hari fitur bertentangan dengan isi dokumen ini, **fitur tersebut salah arah**.
-
-> Secure Decision works when it is read thoughtfully.
-> Tools are secondary. Decisions are primary.
+Database lokal seperti `secure_decision.db`, cache Python, dan script bantu tidak ditujukan sebagai bagian dokumentasi publik utama repo.
